@@ -1,7 +1,80 @@
-import React from "react";
+import React, { useEffect } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+import {
+  obtenerPokemonesAccion,
+  siguientePokemonAccion,
+  anteriorPokemonAccion,
+  unPokemonDetalleAccion,
+} from "../redux/pokeDucks";
+import Detalle from "./Detalle";
 
 const Pokemones = () => {
-  return <div>Lista de pokemones</div>;
+  const dispatch = useDispatch();
+
+  const pokemones = useSelector((store) => store.pokemones.results);
+  const next = useSelector((store) => store.pokemones.next);
+  const previous = useSelector((store) => store.pokemones.previous);
+
+  useEffect(() => {
+    const fetchData = () => {
+      dispatch(obtenerPokemonesAccion());
+    };
+    fetchData();
+  }, [dispatch]);
+
+  return (
+    <div className="row">
+      <div className="col-md-6">
+        <h3>Lista de pokemones</h3>
+
+        <div className="d-flex justify-content-between">
+          {pokemones.length === 0 && (
+            <button
+              onClick={() => dispatch(obtenerPokemonesAccion())}
+              className="btn btn-dark"
+            >
+              Get Pokemones
+            </button>
+          )}
+
+          {next && (
+            <button
+              onClick={() => dispatch(siguientePokemonAccion())}
+              className="btn btn-dark"
+            >
+              Siguiente
+            </button>
+          )}
+          {previous && (
+            <button
+              onClick={() => dispatch(anteriorPokemonAccion())}
+              className="btn btn-dark"
+            >
+              Anterior
+            </button>
+          )}
+        </div>
+        <ul className="list-group mt-3">
+          {pokemones.map((item) => (
+            <li key={item.name} className="list-group-item text-uppercase">
+              {item.name}
+              <button
+                className="btn btn-info btn-sm float-end"
+                onClick={() => dispatch(unPokemonDetalleAccion(item.url))}
+              >
+                Info
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="col-md-6">
+        <h3>Detalle Pokemon</h3>
+        <Detalle />
+      </div>
+    </div>
+  );
 };
 
 export default Pokemones;
